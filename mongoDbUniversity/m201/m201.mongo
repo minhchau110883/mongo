@@ -1,0 +1,4 @@
+//mongoimport --db mongo_university --collection people  people.json
+
+// check result
+db.people.count({email: {$exists: 1}})
