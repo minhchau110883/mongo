@@ -1,0 +1,74 @@
+// Connection
+// ssh -N -L 27020:mongodb-1.weomni-test.com:27017 -L 27019:mongodb-2.weomni-test.com:27017 -L 27020:mongodb-3.weomni-test.com:27017 o2o-stg-bastion
+// Stg
+//    mongodb://wolverine_rw:NBDyfII3Lq4a@127.0.0.1:27020/promotion
+
+// My coupon list
+db.redemption_tx.find({
+    channel: "tsm", 
+    status: "COMPLETE", 
+    projectId: "5d09d5cd2a9ee40001f49cd7", 
+    "attribute.identifierNo": "21981264", 
+    "attribute.identifierType": "TRUEID", 
+    "attribute.action": "redeem", 
+    "attribute.type": "makro_coupon",
+    "attribute.markUsed": {$in: [null,'false']}
+}).sort({
+    last_modified_date: -1
+}).pretty().count();
+
+
+db.redemption_tx.find({
+    channel: "tsm", 
+    status: "COMPLETE", 
+    projectId: "5d0c4e3dd0b6670ab835a6d1", 
+    "attribute.identifierNo": "21981264", 
+    "attribute.identifierType": "TRUEID", 
+    "attribute.action": "redeem", 
+    "attribute.type": "makro_coupon",
+    $and: [{
+        $or: [
+            {"attribute.status": {$exists: false}},
+            {"attribute.status": "MARK_USED"}
+            ]
+        }
+        
+    ],
+    $and: [{
+        $or: [
+            {"campaign.end_date": {$exists: false}},
+            {"campaign.end_date": {$gte: ISODate('2019-07-18T01:28:51.309Z')}}
+            ]
+        }
+        
+    ]
+}).sort({
+    created_date: -1
+}).pretty()
+
+//-----------------------------------------Staging---------------
+db.redemption_tx.find({
+    projectId: "5cf88e55ea2b210001ad1c3d"
+}).count()
+
+db.redemption_tx.find({
+    projectId: "5cf88e55ea2b210001ad1c3d", 
+    "created_date": {$gte: ISODate('2019-08-16T04:28:51.309Z')},
+    "channel": "channel",
+    "campaign.end_date": {$eq: ISODate('2019-08-16T11:15:00.000Z')},
+    "attribute.couponNumber": {$exists: false}
+})
+
+db.redemption_tx.find({
+    projectId: "5cf88e55ea2b210001ad1c3d", 
+    "created_date": {$gte: ISODate('2019-08-16T04:28:51.309Z')},
+    "channel": "channel",
+    "campaign.end_date": {$eq: ISODate('2019-08-16T11:15:00.000Z')},
+    "attribute.couponNumber": {$exists: false}
+})
+
+db.redemption_tx.find({
+    projectId: "5cf88e55ea2b210001ad1c3d", 
+    status: "COMPLETE",
+    "attribute.couponNumber": {$exists: false}
+})
